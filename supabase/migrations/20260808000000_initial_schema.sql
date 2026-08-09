@@ -395,6 +395,24 @@ ON notifications FOR SELECT USING (
     EXISTS (SELECT 1 FROM business_members WHERE business_id = notifications.business_id AND user_id = auth.uid())
 );
 
+-- Business Members Policies
+CREATE POLICY "Users can view memberships in their business" 
+ON business_members FOR SELECT USING (
+    user_id = auth.uid() OR
+    EXISTS (SELECT 1 FROM business_members bm WHERE bm.business_id = business_members.business_id AND bm.user_id = auth.uid())
+);
+
+CREATE POLICY "Owners and Managers can manage business members" 
+ON business_members FOR ALL USING (
+    get_user_business_role(business_id) IN ('owner', 'manager')
+);
+
+-- Webhook Events Policies
+ALTER TABLE webhook_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "System and service role full access to webhook events" 
+ON webhook_events FOR ALL USING (true);
+
 -- ==========================================
 -- 5. ATOMIC STOCK PROCESS FUNCTION
 -- ==========================================
