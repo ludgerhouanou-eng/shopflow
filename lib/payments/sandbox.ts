@@ -56,7 +56,14 @@ export class SandboxPaymentProvider implements PaymentProvider {
       .update(payloadString)
       .digest('hex');
 
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature));
+    const bufSignature = Buffer.from(signature);
+    const bufExpected = Buffer.from(expectedSignature);
+
+    if (bufSignature.length !== bufExpected.length) {
+      return false;
+    }
+
+    return crypto.timingSafeEqual(bufSignature, bufExpected);
   }
 
   async refundPayment(transactionReference: string, amount: number): Promise<PaymentResult> {

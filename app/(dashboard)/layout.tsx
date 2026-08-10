@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { logoutUser } from '@/app/actions/auth';
 
 export default function DashboardLayout({
   children,
@@ -64,7 +65,7 @@ export default function DashboardLayout({
 
         <div className="p-4 border-t border-slate-800 text-xs text-slate-500 flex justify-between items-center">
           <span>Formule : <strong className="text-emerald-400">Gratuit</strong></span>
-          <form action="/api/auth/logout" method="POST">
+          <form action={logoutUser}>
             <button type="submit" className="text-red-400 hover:underline">Déconnexion</button>
           </form>
         </div>
