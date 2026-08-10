@@ -66,7 +66,7 @@ export async function registerUser(input: RegisterInput) {
       .select()
       .single();
 
-    if (businessError || !businessData) throw new Error(`Boutique: ${businessError.message}`);
+    if (businessError || !businessData) throw new Error(`Boutique: ${businessError?.message || 'Impossible de créer la boutique'}`);
 
     // 4. Association Rôle Propriétaire (Owner)
     const { error: memberError } = await adminSupabase.from('business_members').insert({
