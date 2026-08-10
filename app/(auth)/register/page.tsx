@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { registerUser } from '@/app/actions/auth';
 
 export default function RegisterPage() {
-  const router = Router();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
