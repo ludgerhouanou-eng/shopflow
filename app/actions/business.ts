@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { businessSettingsSchema, BusinessSettingsInput } from '@/lib/validations/business';
-import { Business } from '@/types/database';
+import { Business, BusinessMemberWithBusiness } from '@/types/database';
 import { revalidatePath } from 'next/cache';
 
 export async function getCurrentUserBusiness(): Promise<{ success: boolean; business?: Business; error?: string }> {
@@ -13,28 +13,20 @@ export async function getCurrentUserBusiness(): Promise<{ success: boolean; busi
     return { success: false, error: 'Accès non autorisé. Veuillez vous connecter.' };
   }
 
-  // Trouver le business_id de l'utilisateur
-  const { data: memberData, error: memberError } = await supabase
+  // 1. Requête relationnelle typée avec jointure Supabase
+  const { data: rawMember, error: memberError } = await supabase
     .from('business_members')
-    .select('business_id')
+    .select('*, businesses(*)')
     .eq('user_id', user.id)
     .single();
 
-  if (memberError || !memberData) {
+  const member = rawMember as unknown as BusinessMemberWithBusiness | null;
+
+  if (memberError || !member || !member.businesses) {
     return { success: false, error: 'Aucune boutique associée à ce compte.' };
   }
 
-  const { data: business, error: businessError } = await supabase
-    .from('businesses')
-    .select('*')
-    .eq('id', memberData.business_id)
-    .single();
-
-  if (businessError || !business) {
-    return { success: false, error: 'Impossible de charger la boutique.' };
-  }
-
-  return { success: true, business };
+  return { success: true, business: member.businesses };
 }
 
 export async function updateBusinessSettings(input: BusinessSettingsInput) {

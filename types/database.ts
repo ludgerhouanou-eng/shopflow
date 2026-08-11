@@ -230,3 +230,20 @@ export interface Notification {
   sent_at?: string | null;
   created_at: string;
 }
+
+// ==========================================
+// INTERFACES RELATIONNELLES DE JOINTURES SUPABASE
+// ==========================================
+export interface BusinessMemberWithBusiness extends BusinessMember {
+  businesses?: Business | null;
+}
+
+export interface OrderWithItems extends Order {
+  items?: OrderItem[];
+  customer?: Customer | null;
+}
+
+export interface ProductWithCategory extends Product {
+  category?: Category | null;
+}
+
